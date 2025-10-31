@@ -26,5 +26,16 @@ const addNote = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+// ✅ Get notes uploaded by the logged-in user
+const getMyNotes = async (req, res) => {
+  try {
+    const myNotes = await Note.find({ uploadedBy: req.user.id }).populate("uploadedBy", "name role");
+    res.json(myNotes);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 
-module.exports = { getNotes, addNote };
+module.exports = { getNotes, addNote, getMyNotes };
+
+
