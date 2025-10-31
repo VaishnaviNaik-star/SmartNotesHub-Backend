@@ -24,7 +24,9 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
     const note = new Note({
       title: req.body.title,
       subject: req.body.subject,
-      fileUrl: `${process.env.BACKEND_URL || "http://localhost:5000"}/uploads/${req.file.filename}`,
+    fileUrl: `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`,
+
+    
       uploadedBy: req.user.id, // user ID from token
       role: req.user.role,
     });
@@ -59,3 +61,4 @@ router.get("/my", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
