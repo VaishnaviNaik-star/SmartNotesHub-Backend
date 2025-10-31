@@ -27,7 +27,8 @@ app.use(
 app.use(express.json());
 
 // ✅ Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 // ✅ API Routes
 app.use("/api/auth", authRoutes);
@@ -52,3 +53,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
