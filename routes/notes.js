@@ -46,5 +46,18 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch notes" });
   }
 });
+const express = require("express");
+const router = express.Router();
+const { getNotes, addNote, getMyNotes } = require("../controllers/noteController");
+const authMiddleware = require("../middleware/auth");
+
+// Existing routes
+router.get("/", getNotes);
+router.post("/", authMiddleware, addNote);
+
+// ✅ New route for personal dashboard
+router.get("/my", authMiddleware, getMyNotes);
+
 
 module.exports = router;
+
