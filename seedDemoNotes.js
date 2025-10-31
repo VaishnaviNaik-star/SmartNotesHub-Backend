@@ -10,13 +10,13 @@ const seedDemoNotes = async () => {
       {
         title: "Software Engineering - Unit 1 Notes",
         subject: "Software Engineering",
-        fileUrl: "http://localhost:5000/uploads/Unit%201%20SE%20Notes.pdf",
+        fileUrl: "https://smartnoteshub-backend.onrender.com/uploads/Unit%201%20SE%20Notes.pdf",
         uploadedBy: "Admin"
       },
       {
         title: "Software Engineering - Unit 2 Notes",
         subject: "Software Engineering",
-        fileUrl: "http://localhost:5000/uploads/Unit%202%20SE%20Notes.pdf",
+        fileUrl: "https://smartnoteshub-backend.onrender.com/uploads/Unit%202%20SE%20Notes.pdf",
         uploadedBy: "Admin"
       }
     ]);
@@ -28,3 +28,4 @@ const seedDemoNotes = async () => {
 };
 
 module.exports = seedDemoNotes;
+
