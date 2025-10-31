@@ -11,29 +11,44 @@ const notesRoutes = require("./routes/notes");
 dotenv.config();
 const app = express();
 
-app.use(cors());
+// ✅ CORS Configuration for both local and Render frontend
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // local frontend
+      "https://smartnoteshub-frontend.onrender.com", // deployed frontend URL
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+// ✅ Middleware
 app.use(express.json());
 
-// ✅ Serve uploaded PDFs statically
+// ✅ Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ Routes
+// ✅ API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 
-// Root route
+// ✅ Root route for testing
 app.get("/", (req, res) => {
-  res.send("🚀 Smart NotesHub Backend Running!");
+  res.send("🚀 Smart NotesHub Backend Running Successfully!");
 });
 
 // ✅ Connect MongoDB and seed demo notes
 mongoose
   .connect(process.env.MONGO_URI)
   .then(async () => {
-    console.log("✅ MongoDB connected");
-    await seedDemoNotes(); // 🔹 Auto-load demo notes
+    console.log("✅ MongoDB connected successfully!");
+    await seedDemoNotes(); // Auto-seed demo notes
   })
-  .catch((err) => console.log(err));
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
