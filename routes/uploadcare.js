@@ -1,6 +1,6 @@
-import express from "express";
-import axios from "axios";
-import dotenv from "dotenv";
+const express = require("express");
+const axios = require("axios");
+const dotenv = require("dotenv");
 
 dotenv.config();
 const router = express.Router();
@@ -34,4 +34,4 @@ router.post("/store", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
