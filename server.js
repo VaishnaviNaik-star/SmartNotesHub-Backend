@@ -6,16 +6,19 @@ const path = require("path");
 const seedDemoNotes = require("./seedDemoNotes");
 const authRoutes = require("./routes/auth");
 const notesRoutes = require("./routes/notes");
+const uploadcareRoutes = require("./routes/uploadcare"); // ✅ FIXED: use require instead of import
 
+// ✅ Load environment variables
 dotenv.config();
+
 const app = express();
 
-// ✅ CORS Configuration for both local and Render frontend
+// ✅ CORS Configuration
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // local frontend
-      "https://smartnoteshub-frontend.onrender.com", // deployed frontend URL
+      "http://localhost:3000",
+      "https://smartnoteshub-frontend.onrender.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
@@ -25,24 +28,25 @@ app.use(
 // ✅ Middleware
 app.use(express.json());
 
-// ✅ Serve uploaded files
+// ✅ Static uploads (for demo files)
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ API Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
+app.use("/api/uploadcare", uploadcareRoutes); // ✅ Keep this below notes
 
-// ✅ Root route for testing
+// ✅ Root Route
 app.get("/", (req, res) => {
   res.send("🚀 Smart NotesHub Backend Running Successfully!");
 });
 
-// ✅ Connect MongoDB and seed demo notes
+// ✅ MongoDB + Seed
 mongoose
   .connect(process.env.MONGO_URI)
   .then(async () => {
     console.log("✅ MongoDB connected successfully!");
-    await seedDemoNotes(); // Auto-seed demo notes
+    await seedDemoNotes();
   })
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
