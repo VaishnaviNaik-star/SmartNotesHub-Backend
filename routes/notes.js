@@ -7,17 +7,6 @@ const Note = require("../models/Note");
 
 const router = express.Router();
 
-// ✅ Cloudinary storage setup
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "SmartNotesHub", // Folder name in Cloudinary
-    resource_type: "auto",   // Allow PDF, DOCX, images, etc.
-  },
-});
-
-const upload = multer({ storage });
-
 // ✅ POST - Upload a note
 router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   try {
@@ -60,3 +49,4 @@ router.get("/my", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
