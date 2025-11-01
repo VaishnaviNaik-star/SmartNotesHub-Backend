@@ -1,16 +1,35 @@
-const uploadToUploadcare = async (file) => {
-  const formData = new FormData();
-  formData.append("UPLOADCARE_PUB_KEY", UPLOADCARE_PUBLIC_KEY);
-  formData.append("UPLOADCARE_STORE", "1"); // ✅ auto-store permanently
-  formData.append("file", file);
+const express = require("express");
+const axios = require("axios");
+const dotenv = require("dotenv");
 
-  const res = await fetch("https://upload.uploadcare.com/", {
-    method: "POST",
-    body: formData,
-  });
+dotenv.config();
+const router = express.Router();
 
-  const data = await res.json();
-  if (!data.file) throw new Error("File upload failed");
+router.post("/store", async (req, res) => {
+  const { uuid } = req.body;
+  if (!uuid)
+    return res.status(400).json({ success: false, message: "UUID missing" });
 
-  return `https://ucarecdn.com/${data.file}/`; // ✅ permanent CDN URL
-};
+  try {
+    const response = await axios.put(
+      `https://api.uploadcare.com/files/${uuid}/storage/`,
+      null,
+      {
+        headers: {
+          Authorization: `Uploadcare.Simple ${process.env.UPLOADCARE_PUBLIC_KEY}:${process.env.UPLOADCARE_SECRET_KEY}`,
+        },
+      }
+    );
+
+    res.json({
+      success: true,
+      message: "File stored permanently",
+      fileUrl: `https://ucarecdn.com/${uuid}/`,
+    });
+  } catch (error) {
+    console.error("Uploadcare store error:", error.response?.data || error.message);
+    res.status(500).json({ success: false, message: "Failed to store file" });
+  }
+});
+
+module.exports = router; // ✅ ensure this line exists
