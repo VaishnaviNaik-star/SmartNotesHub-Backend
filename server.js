@@ -4,7 +4,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const seedDemoNotes = require("./seedDemoNotes");
-
 const authRoutes = require("./routes/auth");
 const notesRoutes = require("./routes/notes");
 
@@ -29,7 +28,6 @@ app.use(express.json());
 // ✅ Serve uploaded files
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
-
 // ✅ API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
@@ -38,7 +36,6 @@ app.use("/api/notes", notesRoutes);
 app.get("/", (req, res) => {
   res.send("🚀 Smart NotesHub Backend Running Successfully!");
 });
-
 
 // ✅ Connect MongoDB and seed demo notes
 mongoose
@@ -54,5 +51,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
-
