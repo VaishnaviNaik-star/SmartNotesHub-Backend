@@ -6,17 +6,20 @@ const Note = require("../models/Note");
 
 const router = express.Router();
 
-// ✅ Multer file storage setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "SmartNotesHub", // folder in Cloudinary
+    resource_type: "auto",   // allows PDFs, docs, etc.
   },
 });
 
 const upload = multer({ storage });
+
 
 // ✅ POST - Upload a note
 router.post("/", verifyToken, upload.single("file"), async (req, res) => {
@@ -61,4 +64,5 @@ router.get("/my", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
 
