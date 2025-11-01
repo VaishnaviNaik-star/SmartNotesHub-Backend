@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("multer");
+const path = require("path");
 const verifyToken = require("../middleware/authMiddleware");
 const Note = require("../models/Note");
 
@@ -20,10 +21,17 @@ const upload = multer({ storage });
 // ✅ POST - Upload a note
 router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   try {
+    // If file not uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // ✅ Create note entry with correct file URL
     const note = new Note({
       title: req.body.title,
       subject: req.body.subject,
-      fileUrl: req.file.path, // Local path instead of Cloudinary URL
+      // ✅ This ensures the file is accessible from frontend via /api/uploads
+      fileUrl: `api/uploads/${req.file.filename}`,
       uploadedBy: req.user.id,
       role: req.user.role,
     });
@@ -36,7 +44,7 @@ router.post("/", verifyToken, upload.single("file"), async (req, res) => {
   }
 });
 
-// ✅ GET - Fetch all notes
+// ✅ GET - Fetch all notes (for all users)
 router.get("/", async (req, res) => {
   try {
     const notes = await Note.find().sort({ createdAt: -1 });
