@@ -5,33 +5,23 @@ const verifyToken = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// ✅ POST - Upload new note (from frontend)
+// ✅ POST - Upload new note
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { title, subject, fileUrl, uploadedBy, uploadedByName, role } = req.body;
+    const { title, description, fileUrl } = req.body;
 
-    // Validate file
     if (!fileUrl) {
       return res.status(400).json({ message: "File URL missing!" });
     }
 
-    // ✅ Prepare safe data
-    const noteData = {
+    const newNote = new Note({
       title,
-      subject,
+      description,
       fileUrl,
-      uploadedByName,
-      role,
-    };
+      uploadedBy: req.user._id, // ✅ set uploader automatically
+    });
 
-    // ✅ Only assign ObjectId if valid
-    if (uploadedBy && mongoose.Types.ObjectId.isValid(uploadedBy)) {
-      noteData.uploadedBy = uploadedBy;
-    }
-
-    const newNote = new Note(noteData);
     await newNote.save();
-
     res.status(201).json({ message: "✅ Note uploaded successfully!", note: newNote });
   } catch (err) {
     console.error("❌ Error uploading note:", err);
@@ -39,10 +29,10 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ GET - Fetch all notes
+// ✅ GET - All notes (for public view)
 router.get("/", async (req, res) => {
   try {
-    const notes = await Note.find().sort({ createdAt: -1 });
+    const notes = await Note.find().populate("uploadedBy", "name");
     res.json(notes);
   } catch (err) {
     console.error("❌ Error fetching notes:", err);
@@ -50,10 +40,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ GET - User’s own notes
+// ✅ GET - Notes uploaded by the logged-in user
 router.get("/my", verifyToken, async (req, res) => {
   try {
-    const notes = await Note.find({ uploadedBy: req.user.id }).sort({ createdAt: -1 });
+    const notes = await Note.find({ uploadedBy: req.user._id }).sort({ createdAt: -1 });
     res.json(notes);
   } catch (err) {
     console.error("❌ Error fetching user notes:", err);
@@ -67,8 +57,8 @@ router.delete("/:id", verifyToken, async (req, res) => {
     const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    if (note.uploadedBy && note.uploadedBy.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You can delete only your uploaded notes" });
+    if (note.uploadedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this note" });
     }
 
     await note.deleteOne();
