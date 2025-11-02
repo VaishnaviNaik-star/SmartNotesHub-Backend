@@ -5,15 +5,17 @@ const dotenv = require("dotenv");
 dotenv.config();
 const router = express.Router();
 
+// ✅ Permanently store uploaded file and return working CDN URL
 router.post("/store", async (req, res) => {
-  const { uuid } = req.body;
-  if (!uuid)
-    return res.status(400).json({ success: false, message: "UUID missing" });
+  const { uuid, filename } = req.body;
+  if (!uuid || !filename) {
+    return res.status(400).json({ success: false, message: "UUID or filename missing" });
+  }
 
   try {
-    const response = await axios.put(
+    await axios.put(
       `https://api.uploadcare.com/files/${uuid}/storage/`,
-      null,
+      {},
       {
         headers: {
           Authorization: `Uploadcare.Simple ${process.env.UPLOADCARE_PUBLIC_KEY}:${process.env.UPLOADCARE_SECRET_KEY}`,
@@ -21,10 +23,14 @@ router.post("/store", async (req, res) => {
       }
     );
 
-    res.json({
+    // ✅ Use your project-specific CDN domain and encode filename
+    const encodedFilename = encodeURIComponent(filename);
+    const fileUrl = `https://20bnei1lnu.ucarecd.net/${uuid}/${encodedFilename}`;
+
+    return res.json({
       success: true,
       message: "File stored permanently",
-      fileUrl: `https://ucarecdn.com/${uuid}/`,
+      fileUrl,
     });
   } catch (error) {
     console.error("Uploadcare store error:", error.response?.data || error.message);
@@ -32,4 +38,4 @@ router.post("/store", async (req, res) => {
   }
 });
 
-module.exports = router; // ✅ ensure this line exists
+module.exports = router;
