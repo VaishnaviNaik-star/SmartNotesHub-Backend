@@ -4,6 +4,7 @@ const Note = require("../models/Note");
 const verifyToken = require("../middleware/authMiddleware");
 
 const router = express.Router();
+console.log("Received body:", req.body);
 
 // ✅ POST - Upload new note
 router.post("/", verifyToken, async (req, res) => {
@@ -73,4 +74,5 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
 
