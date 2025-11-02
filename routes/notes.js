@@ -8,7 +8,7 @@ const router = express.Router();
 // ✅ POST - Upload new note
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { title, description, fileUrl } = req.body;
+    const { title, subject, fileUrl } = req.body;
 
     if (!fileUrl) {
       return res.status(400).json({ message: "File URL missing!" });
@@ -16,9 +16,9 @@ router.post("/", verifyToken, async (req, res) => {
 
     const newNote = new Note({
       title,
-      description,
+      subject,
       fileUrl,
-      uploadedBy: req.user._id, // ✅ set uploader automatically
+      uploadedBy: req.user._id,
     });
 
     await newNote.save();
