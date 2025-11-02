@@ -14,12 +14,15 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "File URL missing!" });
     }
 
-    const newNote = new Note({
-      title,
-      subject,
-      fileUrl,
-      uploadedBy: req.user._id,
-    });
+const newNote = new Note({
+  title,
+  subject,
+  fileUrl,
+  uploadedBy: req.user._id,
+  uploadedByName: req.user.name,
+  role: req.user.role,
+});
+
 
     await newNote.save();
     res.status(201).json({ message: "✅ Note uploaded successfully!", note: newNote });
@@ -70,3 +73,4 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
